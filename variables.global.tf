@@ -24,6 +24,7 @@ variable "deploy_environment" {
 variable "workload_name" {
   description = "Name of the workload_name"
   type        = string
+  default = "ampls"
 }
 
 variable "org_name" {
@@ -57,35 +58,26 @@ variable "existing_resource_group_name" {
 # Private Endpoint Configuration   ##
 #####################################
 
-variable "enable_private_endpoint" {
-  description = "Manages a Private Endpoint to Azure Container Registry. Default is false."
-  default     = false
+variable "existing_ampls_private_subnet_name" {
+  description = "(Required) Name of the existing subnet for ampls"
 }
 
-variable "existing_private_dns_zone" {
-  description = "Name of the existing private DNS zone"
+variable "existing_ampls_virtual_network_name" {
+  description = "(Required) Name of the virtual network for ampls"
+}
+
+variable "existing_ampls_network_resource_group_name" {
+  description = "(Required) Name of the resource group for ampls network"
+}
+
+variable "linked_log_analytic_workspace_ids" {
+  type        = list(string)
+  default     = [""]
+  description = "(Required) The id of the log analytic workspace to link to the private link service"
+}
+
+variable "azurerm_monitor_private_link_scope_id" {
+  type        = string
   default     = null
+  description = "The id of the private link scope to link to the private link service, if not set, a new private link scope will be created"
 }
-
-variable "private_subnet_address_prefix" {
-  description = "The name of the subnet for private endpoints"
-  default     = null
-}
-
-variable "create_private_endpoint_subnet" {
-  description = "Controls if the subnet should be created. If set to false, the subnet name must be provided. Default is false."
-  type        = bool
-  default     = false
-}
-
-variable "existing_private_subnet_name" {
-  description = "Name of the existing subnet for the private endpoint"
-  default     = null
-}
-
-variable "virtual_network_name" {
-  description = "Name of the virtual network for the private endpoint"
-  default     = null
-}
-
-# Add more variables as needed
