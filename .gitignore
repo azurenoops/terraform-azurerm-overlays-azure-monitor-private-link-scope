@@ -82,6 +82,5 @@ test/go.sum
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
 !**/*.tfvars
-infrastructure/terraform/destroy.tfplan
-infrastructure/terraform/*.plan
-infrastructure/terraform/03-modules.management.budgets.tf
+!**/*/destroy.tfplan
+!**/*/*.plan
