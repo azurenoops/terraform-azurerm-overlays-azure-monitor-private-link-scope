@@ -2,9 +2,9 @@
 # Licensed under the MIT License.
 
 #---------------------------------------------------------
-# Private Link Endpoints for Azure Monitor 
+# Private Link Endpoints for Azure Monitor
 #---------------------------------------------------------
-resource "azurerm_private_endpoint" "ampls" {  
+resource "azurerm_private_endpoint" "ampls" {
   name                = local.private_endpoint_name
   location            = local.location
   resource_group_name = local.resource_group_name
@@ -12,7 +12,7 @@ resource "azurerm_private_endpoint" "ampls" {
 
   private_dns_zone_group {
     name                 = "default"
-    private_dns_zone_ids = azurerm_private_dns_zone.main.*.id
+    private_dns_zone_ids = module.mod_pdz.*.private_dns_zone_id
   }
 
   private_service_connection {
@@ -27,9 +27,36 @@ resource "azurerm_private_endpoint" "ampls" {
 # Private DNS Zones
 # --------------------------------------------------------------------------------------------------
 
-resource "azurerm_private_dns_zone" "main" {
-  count               = length(local.private_dns_zones_names)
-  name                = element(local.private_dns_zones_names, count.index)
-  resource_group_name = local.resource_group_name
+module "mod_pdz" {
+  source  = "azurenoops/overlays-private-dns-zone/azurerm"
+  version = "~> 1.0"
+  count   = length(local.private_dns_zones_names)
+
+  # Resource Group, location, VNet and Subnet details
+  location           = var.location
+  deploy_environment = var.deploy_environment
+  environment        = var.environment
+  org_name           = var.org_name
+  workload_name      = var.workload_name
+
+  private_dns_zone_name        = element(local.private_dns_zones_names, count.index)
+  existing_resource_group_name = local.resource_group_name
+  private_dns_zone_vnets_ids = [
+    data.azurerm_virtual_network.ampls_vnet.id
+  ]
+/*
+  # Private DNS Zone Record Set details
+  soa_record_private_dns = [
+    {
+      email        = "azureprivatedns-host.microsoft.com"
+      refresh_time = 3600
+      retry_time   = 300
+      expire_time  = 2419200
+      minimum_ttl  = 10
+      ttl          = 300
+    }
+  ] */
+
+  add_tags = merge({ "ResourceName" = format("privatednszone%s", lower(replace(element(local.private_dns_zones_names, count.index), "/[[:^alnum:]]/", ""))) }, local.default_tags, var.add_tags, )
 }
 
