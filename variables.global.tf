@@ -60,14 +60,17 @@ variable "existing_resource_group_name" {
 
 variable "existing_ampls_private_subnet_name" {
   description = "(Required) Name of the existing subnet for ampls"
+  default = null
 }
 
 variable "existing_ampls_virtual_network_name" {
   description = "(Required) Name of the virtual network for ampls"
+  default = null
 }
 
 variable "existing_ampls_network_resource_group_name" {
   description = "(Required) Name of the resource group for ampls network"
+  default = null
 }
 
 variable "linked_log_analytic_workspace_ids" {
