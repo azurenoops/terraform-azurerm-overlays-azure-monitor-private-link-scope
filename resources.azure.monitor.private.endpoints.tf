@@ -8,11 +8,11 @@ resource "azurerm_private_endpoint" "ampls" {
   name                = local.private_endpoint_name
   location            = local.location
   resource_group_name = local.resource_group_name
-  subnet_id           = data.azurerm_subnet.ampls_subnet[0].id
+  subnet_id           = var.existing_ampls_private_subnet_id
 
   private_dns_zone_group {
     name                 = "default"
-    private_dns_zone_ids = module.mod_pdz.*.private_dns_zone_id
+    private_dns_zone_ids = var.private_dns_zone_ids
   }
 
   private_service_connection {
@@ -42,7 +42,7 @@ module "mod_pdz" {
   private_dns_zone_name        = element(local.private_dns_zones_names, count.index)
   existing_resource_group_name = local.resource_group_name
   private_dns_zone_vnets_ids = [
-    data.azurerm_virtual_network.ampls_vnet[0].id
+    var.existing_ampls_virtual_network_id
   ]
 /*
   # Private DNS Zone Record Set details

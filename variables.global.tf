@@ -58,18 +58,13 @@ variable "existing_resource_group_name" {
 # Private Endpoint Configuration   ##
 #####################################
 
-variable "existing_ampls_private_subnet_name" {
-  description = "(Required) Name of the existing subnet for ampls"
+variable "existing_ampls_private_subnet_id" {
+  description = "(Required) ID of the subnet for ampls"
   default = null
 }
 
-variable "existing_ampls_virtual_network_name" {
-  description = "(Required) Name of the virtual network for ampls"
-  default = null
-}
-
-variable "existing_ampls_network_resource_group_name" {
-  description = "(Required) Name of the resource group for ampls network"
+variable "existing_ampls_virtual_network_id" {
+  description = "(Required) ID of the virtual network for ampls"
   default = null
 }
 
@@ -83,4 +78,10 @@ variable "azurerm_monitor_private_link_scope_id" {
   type        = string
   default     = null
   description = "The id of the private link scope to link to the private link service, if not set, a new private link scope will be created"
+}
+
+variable "private_dns_zone_ids" {
+  type        = list(string)
+  default     = [""]
+  description = "The ids of the private dns zone to link to the private link service"
 }

@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
- resource "azurerm_resource_group" "example-network-rg" {
+resource "azurerm_resource_group" "example-network-rg" {
   name     = "example-network-rg"
   location = var.location
   tags = {
@@ -54,6 +54,15 @@ resource "azurerm_log_analytics_workspace" "example-log" {
   resource_group_name = azurerm_resource_group.example-network-rg.name
   sku                 = "PerGB2018"
   retention_in_days   = 30
+  tags = {
+    environment = "test"
+  }
+}
+
+resource "azurerm_private_dns_zone" "example-pdz" {
+  for_each            = local.default_private_dns_zones
+  name                = each.value
+  resource_group_name = azurerm_resource_group.example-network-rg.name
   tags = {
     environment = "test"
   }

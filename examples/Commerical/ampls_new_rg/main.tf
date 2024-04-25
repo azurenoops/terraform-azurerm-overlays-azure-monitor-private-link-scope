@@ -18,10 +18,12 @@ module "mod_ampls" {
   # Log Analytics Workspaces
   linked_log_analytic_workspace_ids = [azurerm_log_analytics_workspace.example-log.id]
 
+  # Private DNS details
+  private_dns_zone_ids = [azurerm_private_dns_zone.example-pdz[*].id]
+
   # Private Endpoint details
   # Resource Group, location, VNet and Subnet details
   # This need to be the same as the VNet and Subnet where the Private Endpoint will be deployed
-  existing_ampls_network_resource_group_name = azurerm_resource_group.example-network-rg.name
-  existing_ampls_virtual_network_name        = azurerm_virtual_network.example-vnet.name
-  existing_ampls_private_subnet_name         = azurerm_subnet.example-snet.name
+  existing_ampls_virtual_network_id     = azurerm_virtual_network.example-vnet.id
+  existing_ampls_private_subnet_id      = azurerm_subnet.example-snet.id
 }

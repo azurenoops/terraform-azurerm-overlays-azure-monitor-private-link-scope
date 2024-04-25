@@ -69,12 +69,14 @@ module "mod_ampls" {
   # Log Analytics Workspaces
   linked_log_analytic_workspace_ids = [azurerm_log_analytics_workspace.example-log.id]
 
+  # Private DNS details
+  private_dns_zone_ids = [module.mod_hub_network.private_dns_zone_ids["privatelink.agentsvc.azure-automation.net"].id]
+
   # Private Endpoint details
   # Resource Group, location, VNet and Subnet details
   # This need to be the same as the VNet and Subnet where the Private Endpoint will be deployed
-  existing_ampls_network_resource_group_name = azurerm_resource_group.example-network-rg.name
-  existing_ampls_virtual_network_name        = azurerm_virtual_network.example-vnet.name
-  existing_ampls_private_subnet_name         = azurerm_subnet.example-snet.name
+  existing_ampls_virtual_network_id     = module.mod_ops_network.virtual_network_id
+  existing_ampls_private_subnet_id      = module.mod_ops_network.subnet_ids["ampls"].id
   
   # Tags
   add_tags = {} # Tags to be applied to all resources
@@ -103,6 +105,7 @@ module "mod_ampls" {
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_mod_azure_region_lookup"></a> [mod\_azure\_region\_lookup](#module\_mod\_azure\_region\_lookup) | azurenoops/overlays-azregions-lookup/azurerm | ~> 1.0.0 |
+| <a name="module_mod_pdz"></a> [mod\_pdz](#module\_mod\_pdz) | azurenoops/overlays-private-dns-zone/azurerm | ~> 1.0 |
 | <a name="module_mod_scaffold_rg"></a> [mod\_scaffold\_rg](#module\_mod\_scaffold\_rg) | azurenoops/overlays-resource-group/azurerm | ~> 1.0.1 |
 
 ## Resources
@@ -111,15 +114,12 @@ module "mod_ampls" {
 |------|------|
 | [azurerm_monitor_private_link_scope.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_private_link_scope) | resource |
 | [azurerm_monitor_private_link_scoped_service.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_private_link_scoped_service) | resource |
-| [azurerm_private_dns_zone.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) | resource |
 | [azurerm_private_endpoint.ampls](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurenoopsutils_resource_name.azurerm_private_dns_a_record](https://registry.terraform.io/providers/azurenoops/azurenoopsutils/latest/docs/data-sources/resource_name) | data source |
 | [azurenoopsutils_resource_name.azurerm_private_endpoint](https://registry.terraform.io/providers/azurenoops/azurenoopsutils/latest/docs/data-sources/resource_name) | data source |
 | [azurenoopsutils_resource_name.azurerm_private_link_service](https://registry.terraform.io/providers/azurenoops/azurenoopsutils/latest/docs/data-sources/resource_name) | data source |
 | [azurenoopsutils_resource_name.azurerm_private_service_connection](https://registry.terraform.io/providers/azurenoops/azurenoopsutils/latest/docs/data-sources/resource_name) | data source |
-| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 | [azurerm_resource_group.rgrp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
-| [azurerm_subnet.ampls_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
 
 ## Inputs
 
@@ -137,15 +137,15 @@ module "mod_ampls" {
 | <a name="input_default_tags_enabled"></a> [default\_tags\_enabled](#input\_default\_tags\_enabled) | Option to enable or disable default tags. | `bool` | `true` | no |
 | <a name="input_deploy_environment"></a> [deploy\_environment](#input\_deploy\_environment) | Name of the workload's environment | `string` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | The Terraform backend environment e.g. public or usgovernment | `string` | n/a | yes |
-| <a name="input_existing_ampls_network_resource_group_name"></a> [existing\_ampls\_network\_resource\_group\_name](#input\_existing\_ampls\_network\_resource\_group\_name) | (Required) Name of the resource group for ampls network | `any` | n/a | yes |
-| <a name="input_existing_ampls_private_subnet_name"></a> [existing\_ampls\_private\_subnet\_name](#input\_existing\_ampls\_private\_subnet\_name) | (Required) Name of the existing subnet for ampls | `any` | n/a | yes |
-| <a name="input_existing_ampls_virtual_network_name"></a> [existing\_ampls\_virtual\_network\_name](#input\_existing\_ampls\_virtual\_network\_name) | (Required) Name of the virtual network for ampls | `any` | n/a | yes |
+| <a name="input_existing_ampls_private_subnet_id"></a> [existing\_ampls\_private\_subnet\_id](#input\_existing\_ampls\_private\_subnet\_id) | (Required) ID of the subnet for ampls | `any` | `null` | no |
+| <a name="input_existing_ampls_virtual_network_id"></a> [existing\_ampls\_virtual\_network\_id](#input\_existing\_ampls\_virtual\_network\_id) | (Required) ID of the virtual network for ampls | `any` | `null` | no |
 | <a name="input_existing_resource_group_name"></a> [existing\_resource\_group\_name](#input\_existing\_resource\_group\_name) | The name of the existing resource group to use. If not set, the name will be generated using the `org_name`, `workload_name`, `deploy_environment` and `environment` variables. | `string` | `null` | no |
 | <a name="input_linked_log_analytic_workspace_ids"></a> [linked\_log\_analytic\_workspace\_ids](#input\_linked\_log\_analytic\_workspace\_ids) | (Required) The id of the log analytic workspace to link to the private link service | `list(string)` | <pre>[<br>  ""<br>]</pre> | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region in which instance will be hosted | `string` | n/a | yes |
 | <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | Optional prefix for the generated name | `string` | `""` | no |
 | <a name="input_name_suffix"></a> [name\_suffix](#input\_name\_suffix) | Optional suffix for the generated name | `string` | `""` | no |
 | <a name="input_org_name"></a> [org\_name](#input\_org\_name) | Name of the organization | `string` | n/a | yes |
+| <a name="input_private_dns_zone_ids"></a> [private\_dns\_zone\_ids](#input\_private\_dns\_zone\_ids) | The ids of the private dns zone to link to the private link service | `list(string)` | <pre>[<br>  ""<br>]</pre> | no |
 | <a name="input_use_location_short_name"></a> [use\_location\_short\_name](#input\_use\_location\_short\_name) | Use short location name for resources naming (ie eastus -> eus). Default is true. If set to false, the full cli location name will be used. if custom naming is set, this variable will be ignored. | `bool` | `true` | no |
 | <a name="input_use_naming"></a> [use\_naming](#input\_use\_naming) | Use the Azure NoOps naming provider to generate default resource name. `storage_account_custom_name` override this if set. Legacy default name is used if this is set to `false`. | `bool` | `true` | no |
 | <a name="input_workload_name"></a> [workload\_name](#input\_workload\_name) | Name of the workload\_name | `string` | `"ampls"` | no |
