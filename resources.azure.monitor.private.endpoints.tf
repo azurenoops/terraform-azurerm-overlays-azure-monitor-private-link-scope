@@ -23,40 +23,5 @@ resource "azurerm_private_endpoint" "ampls" {
   }
 }
 
-# --------------------------------------------------------------------------------------------------
-# Private DNS Zones
-# --------------------------------------------------------------------------------------------------
 
-module "mod_pdz" {
-  source  = "azurenoops/overlays-private-dns-zone/azurerm"
-  version = "~> 1.0"
-  count   = length(local.private_dns_zones_names)
-
-  # Resource Group, location, VNet and Subnet details
-  location           = var.location
-  deploy_environment = var.deploy_environment
-  environment        = var.environment
-  org_name           = var.org_name
-  workload_name      = var.workload_name
-
-  private_dns_zone_name        = element(local.private_dns_zones_names, count.index)
-  existing_resource_group_name = local.resource_group_name
-  private_dns_zone_vnets_ids = [
-    var.existing_ampls_virtual_network_id
-  ]
-/*
-  # Private DNS Zone Record Set details
-  soa_record_private_dns = [
-    {
-      email        = "azureprivatedns-host.microsoft.com"
-      refresh_time = 3600
-      retry_time   = 300
-      expire_time  = 2419200
-      minimum_ttl  = 10
-      ttl          = 300
-    }
-  ] */
-
-  add_tags = merge({ "ResourceName" = format("privatednszone%s", lower(replace(element(local.private_dns_zones_names, count.index), "/[[:^alnum:]]/", ""))) }, local.default_tags, var.add_tags, )
-}
 
