@@ -11,7 +11,7 @@ resource "azurerm_private_endpoint" "ampls" {
   subnet_id           = var.existing_ampls_private_subnet_id
 
   private_dns_zone_group {
-    name                 = "default"
+    name                 = "ampls-default"
     private_dns_zone_ids = var.private_dns_zone_ids
   }
 
