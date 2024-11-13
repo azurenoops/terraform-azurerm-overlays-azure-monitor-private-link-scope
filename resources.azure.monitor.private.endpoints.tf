@@ -21,6 +21,8 @@ resource "azurerm_private_endpoint" "ampls" {
     private_connection_resource_id = var.azurerm_monitor_private_link_scope_id == null ? join("", azurerm_monitor_private_link_scope.main.*.id) : var.azurerm_monitor_private_link_scope_id
     subresource_names              = ["azuremonitor"]
   }
+
+  depends_on = [ azurerm_monitor_private_link_scoped_service.main ]
 }
 
 
